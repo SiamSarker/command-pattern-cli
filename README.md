@@ -1,54 +1,54 @@
 # Command Pattern Calculator CLI
 
-A command-line program in Python built using the **Command Pattern (GoF)** with reversible operations (undo stack).
-
-Developed for the Werkstudent coding challenge at **ekvip automation GmbH**.
+A simple Python console calculator built using the Command Pattern with reversible operations (`undo`).
 
 ---
 
-## 1. Design & Architecture
+## Overview & Structure
 
-The application implements the Command Pattern where each operation is encapsulated in its own class inheriting from an abstract `Command` base:
+Each calculator operation is encapsulated in its own class extending an abstract `Command` base:
 
-- **`Command` (Base Interface):** Defines `execute(val)` and `undo(val)`.
-- **Concrete Commands:**
+- **`Command`**: Base class defining `execute(val)` and `undo(val)`.
+- **Commands**:
   - `IncrementCommand`: Adds 1 (undo subtracts 1).
   - `DecrementCommand`: Subtracts 1 (undo adds 1).
   - `DoubleCommand`: Multiplies by 2 (undo divides by 2).
-  - `RandAddCommand`: Adds a random integer and stores the generated delta in the instance so `undo()` subtracts the exact same offset.
-- **`Calculator` (Invoker & State Holder):** Holds `current_value` and a `history` stack of executed commands. It pushes commands on execution and pops them on `undo()`.
-- **Command Dispatching:** Uses a clean dictionary mapping (`COMMANDS`) to map user input strings to their corresponding command classes.
+  - `RandAddCommand`: Adds a random integer and saves the generated delta in the instance so `undo()` subtracts the exact same offset.
+- **`Calculator`**: Holds the running `current_value` and a `history` list. It runs commands and handles `undo` by popping the last command off the stack.
+- **`COMMANDS` map**: A clean dictionary mapping command strings to their classes.
 
 ---
 
-## 2. Assumptions for Under-Specified Requirements
+## Assumptions & Design Choices
 
-1. **`randadd` Range & Behavior:**
-   - Generates a non-zero integer between `-100` and `100` (excluding `0`) so every call produces a noticeable change in state.
-   - The generated delta is stored in `self.delta` inside the command instance, ensuring that `undo()` subtracts the exact number that was added.
-2. **Result Formatting:**
-   - Both integers and floating-point values are supported.
-   - Results are rounded to 4 decimal places to prevent binary floating-point precision jitter (e.g., `0.1 + 0.2`).
-   - If a result is a whole number (e.g. `4.0` from `8 / 2`), it is displayed as an integer (`4`) to match the prompt's reference output: `2, 3, 4, 8, 4, 3`.
-3. **Empty Undo Stack:**
-   - If `undo` is called when no previous operations exist on the stack, it outputs `"No commands to undo."` without crashing.
-4. **Input Normalization & Graceful Exit:**
+To handle under-specified points from the requirements:
+
+1. **`randadd` behavior:**
+   - Generates a non-zero integer between `-100` and `100` (excluding `0`) so every call produces a noticeable change.
+   - Stores the generated number in `self.delta` on that command instance so `undo()` reverses the exact number that was added.
+2. **Output formatting:**
+   - Supports both integers and floating-point inputs.
+   - Values are rounded to 4 decimal places to prevent floating-point precision jitter (like `0.1 + 0.2`).
+   - If a number is whole (e.g., `4.0` from `8 / 2`), it prints as an integer `4` to match the example output: `2, 3, 4, 8, 4, 3`.
+3. **Empty history:**
+   - If `undo` is called when history is empty, it prints `"No commands to undo."` without crashing.
+4. **Input handling & exit:**
    - Inputs are stripped of whitespace and lowercased (`increment`, `INCREMENT`, etc.).
-   - The user can exit the infinite loop by typing `exit`, `quit`, or pressing `Ctrl+C` / `Ctrl+D`.
+   - The loop can be exited anytime with `exit`, `quit`, or `Ctrl+C` / `Ctrl+D`.
 
 ---
 
-## 3. How to Run
+## How to Run
 
-Requires Python 3.8+ (standard library only).
+Standard library only (Python 3.8+).
 
-Run `main.py` with the initial number as a command-line argument:
+Run `main.py` with an initial number:
 
 ```bash
 python3 main.py 1
 ```
 
-### Example Session (matching the prompt sequence):
+### Example Session
 ```text
 > increment
 2
@@ -67,17 +67,17 @@ python3 main.py 1
 
 ---
 
-## 4. Running the Tests
+## Running the Unit Tests
 
-An automated test suite using Python's built-in `unittest` is provided in `test_calculator.py`:
+Automated tests are in `test_calculator.py`:
 
 ```bash
 python3 test_calculator.py
 ```
 
-All 7 test cases verify:
-- The exact sequence from the specification (`1 -> increment, increment, increment, double, undo, undo -> 2, 3, 4, 8, 4, 3`).
-- Reversibility of arithmetic operations (`decrement`, `double`).
-- Preservation and exact undo of random deltas in `RandAddCommand`.
-- Boundary handling when calling undo on an empty stack.
-- Input command dictionary mapping.
+Tests verify:
+- The exact sequence from the task prompt (`1 -> increment, increment, increment, double, undo, undo -> 2, 3, 4, 8, 4, 3`).
+- Math reversibility for `decrement` and `double`.
+- Preserving and undoing random offsets in `RandAddCommand`.
+- Empty undo stack safety.
+- Input dictionary mapping.
