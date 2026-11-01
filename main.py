@@ -41,22 +41,18 @@ class RandAddCommand(Command):
         # Store delta in this instance so undo() knows the exact offset to subtract.
         # Delta can also be passed directly for unit tests.
         if delta is not None:
-            self.random_factor = delta
+            self.delta = delta
         else:
             # Pick a non-zero integer between -100 and 100 so there's always a visible change
-            self.random_factor = random.randint(-100, 100)
-            while self.random_factor == 0:
-                self.random_factor = random.randint(-100, 100)
-
-    @property
-    def delta(self) -> int:
-        return self.random_factor
+            self.delta = random.randint(-100, 100)
+            while self.delta == 0:
+                self.delta = random.randint(-100, 100)
 
     def execute(self, val: float) -> float:
-        return val + self.random_factor
+        return val + self.delta
 
     def undo(self, val: float) -> float:
-        return val - self.random_factor
+        return val - self.delta
 
 
 class Calculator:
@@ -73,16 +69,10 @@ class Calculator:
             return int(val)
         return val
 
-    # Convenience alias for test harnesses
-    get_formatted_result = get_result
-
     def run_command(self, command: Command):
         self.current_value = command.execute(self.current_value)
         self.history.append(command)
         return self.get_result()
-
-    # Convenience alias for test harnesses
-    execute_command = run_command
 
     def undo(self):
         # Guard against empty stack if user runs undo before any operations

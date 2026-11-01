@@ -74,7 +74,7 @@ class TestCalculatorOperations(unittest.TestCase):
 
         calc.run_command(rand_cmd)
         self.assertNotEqual(calc.get_result(), original_value)
-        self.assertEqual(calc.current_value, original_value + rand_cmd.random_factor)
+        self.assertEqual(calc.current_value, original_value + rand_cmd.delta)
 
         # Undo must restore the exact original value
         restored = calc.undo()
