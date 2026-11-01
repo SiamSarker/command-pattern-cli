@@ -25,7 +25,7 @@ The application implements the Command Pattern where each operation is encapsula
 
 1. **`randadd` Range & Behavior:**
    - Generates a non-zero integer between `-100` and `100` (excluding `0`) so every call produces a noticeable change in state.
-   - The generated delta is stored in `self.random_factor` inside the command instance, ensuring that `undo()` subtracts the exact number that was added.
+   - The generated delta is stored in `self.delta` inside the command instance, ensuring that `undo()` subtracts the exact number that was added.
 2. **Result Formatting:**
    - Both integers and floating-point values are supported.
    - Results are rounded to 4 decimal places to prevent binary floating-point precision jitter (e.g., `0.1 + 0.2`).
